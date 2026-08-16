@@ -1,7 +1,8 @@
 import 'package:cloud_frog/cloud_frog.dart' show User;
 import 'package:dart_frog/dart_frog.dart';
-import 'package:riverpod/misc.dart' show ProviderListenable;
-import 'package:riverpod/riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'riverpod.g.dart';
 
 /// Makes the application-wide Riverpod container available to a request.
 ///
@@ -11,13 +12,12 @@ Middleware rootRiverpod(ProviderContainer rootContainer) =>
     provider<ProviderContainer>((context) => rootContainer);
 
 /// The authenticated Cloud Frog user, or `null` outside a request user scope.
-final userProvider = Provider<User?>((ref) => null, dependencies: const []);
+@Riverpod(keepAlive: true, dependencies: [])
+User? user(Ref ref) => null;
 
 /// The authenticated user's subject, or `null` outside a user scope.
-final currentUserIdProvider = Provider<String?>(
-  (ref) => ref.watch(userProvider)?.subject,
-  dependencies: [userProvider],
-);
+@Riverpod(keepAlive: true, dependencies: [user])
+String? currentUserId(Ref ref) => ref.watch(userProvider)?.subject;
 
 /// Helpers for providers that can run both in requests and background jobs.
 extension UserContextRef on Ref {

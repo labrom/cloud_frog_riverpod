@@ -7,6 +7,8 @@ import 'package:riverpod/riverpod.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 
+import 'generated_dependency.dart';
+
 void main() {
   group('ProviderContainer user scope', () {
     late ProviderContainer root;
@@ -35,6 +37,13 @@ void main() {
       final scoped = root.scopedToUser('user-1');
       addTearDown(scoped.dispose);
       expect(() => scoped.scopedToUser('user-2'), throwsStateError);
+    });
+
+    test('supports generated dependencies on currentUserId', () {
+      final scoped = root.scopedToUser('generated-user');
+      addTearDown(scoped.dispose);
+
+      expect(scoped.read(generatedUserIdProvider), 'generated-user');
     });
   });
 
